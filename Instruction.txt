@@ -1,0 +1,6 @@
+For JWT token generate:
+1. composer version check
+composer -V
+
+2. composer require firebase/php-jwt
+composer install

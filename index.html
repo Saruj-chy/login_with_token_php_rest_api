@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JWT Auth</title>
+</head>
+<body>
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username" /><br />
+  <input type="password" id="password" placeholder="Password" /><br />
+  <button onclick="login()">Login</button>
+
+  <h2>Protected Request</h2>
+  <button onclick="getProtected()">Access Protected</button>
+  <button onclick="refresh()">Refresh Token</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    let accessToken = '';
+    let refreshToken = '';
+
+    function login() {
+      fetch('http://localhost/jwt_token/jwt-auth.php?path=login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        accessToken = data.access_token;
+        refreshToken = data.refresh_token;
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      });
+    }
+
+    function getProtected() {
+      fetch('http://localhost/jwt_token/jwt-auth.php?path=protected', {
+        headers: {'Authorization': 'Bearer ' + accessToken}
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      });
+    }
+
+    function refresh() {
+      fetch('http://localhost/jwt_token/jwt-auth.php?path=refresh', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ refresh_token: refreshToken })
+      })
+      .then(res => res.json())
+      .then(data => {
+        accessToken = data.access_token;
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      });
+    }
+  </script>
+</body>
+</html>
